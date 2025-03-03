@@ -29,12 +29,46 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const sportCollection = client.db('sportDB').collection('sport');
+
+    app.get('/all-products', async (req, res) => {
+        try {
+            const products = await sportCollection.find().toArray(); 
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ error: "Something went wrong" });
+        }
+    });
+    
+
+    app.get('/limited-products', async (req, res) => {
+        try {
+            const products = await sportCollection.find().limit(6).toArray();
+            res.json(products);
+        } catch (error) {
+            res.status(500).json({ error: "Something went wrong" });
+        }
+    });
+
+    
+
+    app.post('/equipment',async(req,res)=>{
+        const newEquipment=req.body;
+        console.log(newEquipment);
+        const result = await sportCollection.insertOne(newEquipment);
+        res.send(result);
+    })
+    
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
