@@ -52,9 +52,12 @@ async function run() {
         const result= await cursor.toArray();
         res.send(result);
     })
-
+    // update
     app.get("/equipment/:id", async(req,res)=>{
       const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await sportCollection.findOne(query);
+      res.send(result);
     })
 
     // Add equipment
@@ -64,6 +67,32 @@ async function run() {
       const result = await sportCollection.insertOne(newEquipment);
       res.send(result);
     });
+    // Update
+    app.put("/equipment/:id", async (req, res) =>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert:true};
+      const updateEquipment =req.body;
+      const equipment = {
+        $set:{
+          name:updateEquipment.name, 
+          image:updateEquipment.image, 
+          category:updateEquipment.category, 
+          description:updateEquipment.description, 
+          price:updateEquipment.price, 
+          rating:updateEquipment.rating, 
+          customization:updateEquipment.customization, 
+          processingTime:updateEquipment.processingTime, 
+          stockStatus:updateEquipment.stockStatus, 
+          userEmail:updateEquipment.userEmail, 
+          userName:updateEquipment.userName
+        }
+      }
+
+      const result = await sportCollection.updateOne(filter,equipment,options);
+      res.send(result);
+
+    })
     // delete
     app.delete("/equipment/:id", async (req, res) => {
       const id = req.params.id;
